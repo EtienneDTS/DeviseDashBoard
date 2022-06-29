@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Devise Dashboard</title>
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.8.0/dist/chart.min.js" integrity="sha256-cHVO4dqZfamRhWD7s4iXyaXWVK10odD+qp4xidFzqTI=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline"></script>
+</head>
+<body class="bg-dark">
+    <div class="row" >
+        <div class="col">
+            <h1 class="text-white" style="text-align:center">Tableau de bord - {{page_label}}</h1>
+
+            <a href="{% url 'Dashboard' currencie=currencies days_rate=7%}"
+               class="btn {% if page_label == 'Semaine' %} btn-info {% else %} btn-secondary {% endif %}"
+               role="button">Semaine</a>
+            <a href="{% url 'Dashboard' currencie=currencies days_rate=30%}"
+               class="btn {% if page_label == 'Mois' %} btn-info {% else %} btn-secondary {% endif %}"
+               role="button">Mois</a>
+            <a href="{% url 'Dashboard' currencie=currencies days_rate=365%}"
+               class="btn {% if page_label == 'Année' %} btn-info {% else %} btn-secondary {% endif %}"
+               role="button">Année</a>
+        </div>
+    </div>
+
+
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            {% for currency,rates in data.items %}
+            <div class="col-md-10 col-lg-6">
+                <canvas id="myChart-{{ currency }}"></canvas>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        {% for currency, rates in data.items %}
+        var ctx = document.getElementById('myChart-{{ currency }}');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {labels: {{ days_labels|safe }},
+                datasets: [{
+                    label: "EUR/{{ currency|safe }}",
+                    data: {{ rates|safe }},
+                    borderColor: 'rgb(255, 128, 128)',
+                    fill: false,
+                    tension: 0.1,
+                    trendlineLinear: {
+                        style: "#3394FF",
+                        width: 3,
+                    }
+                }]
+            }
+        });
+        {% endfor %}
+    </script>
+
+
+</body>
+</html>
